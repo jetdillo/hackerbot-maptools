@@ -12,7 +12,7 @@ To run, do one of the following:
    - Use map_puller.py to download a map from your robot onto the onboard Raspi 
    - cut-and-paste the terminal output from a Python miniterm session:
      Send `MACHINE,1` followed by `GETMAP,1` (or whatever map you want) and save the whole
-     JSON output from the `GETMAP,1` command to a text file. The file should have 1 continuous, very long JSON string(See the maptexts directory for examples)
+     JSON output from the `GETMAP,1` command to a text file. The file should have 1 continuous, very long JSON string(See the `maptexts` directory for examples)
    
    - Run `hackerbot_map_utils.py -f <textfile>`. You should see output showing the resolution of the decompressed map and number of bytes processed from the script along with a new .pgm and .png file. Those are your mapfiles. 
 
