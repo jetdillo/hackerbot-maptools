@@ -1,11 +1,11 @@
 # hackerbot
-code to support the Hackerbot Industries Hackerbot
-hackerbot_map_utils.py  - decodes JSON-based compressed maps into ROS-compatible map files
+code to support the [Hackerbot Industries Hackerbot](https://www.hackerbot.co/)
 
-map_puller.py - Python script to download a map off the Hackerbot to a file
-
-maptexts - sample maps in compressed JSON format.
-maps - sample map images
+What does what here:
+- hackerbot_map_utils.py  - decodes JSON-based compressed maps into ROS-compatible map files
+- map_puller.py - Python script to download a map off the Hackerbot to a file
+- maptexts - sample maps in compressed JSON format.
+- maps - sample map images
 
 To run, do one of the following:
 
