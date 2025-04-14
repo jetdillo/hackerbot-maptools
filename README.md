@@ -13,6 +13,21 @@ To run, do one of the following:
    - cut-and-paste the terminal output from a Python miniterm session:
      Send `MACHINE,1` followed by `GETMAP,1` (or whatever map you want) and save the whole
      JSON output from the `GETMAP,1` command to a text file. The file should have 1 continuous, very long JSON string(See the `maptexts` directory for examples)
+
+```
+usage: map_puller.py [-h] [-o OUTFILE] [-p PORT] [-m MAP_ID] [-l]
+
+get maps stored on a Hackerbot base
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTFILE, --outfile OUTFILE
+                        filename to save map as,include full path if necessary
+  -p PORT, --port PORT  serial port to use(default=/dev/ttyACM0)
+  -m MAP_ID, --map_id MAP_ID
+                        id of map to retrieve
+  -l, --listmaps        List map ids, skip retrieval
+```
    
    - Run `hackerbot_map_utils.py -f <textfile>`. You should see output showing the resolution of the decompressed map and number of bytes processed from the script along with a new .pgm and .png file. Those are your mapfiles. 
 
