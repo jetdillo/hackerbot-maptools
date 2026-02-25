@@ -53,6 +53,6 @@ free_thresh: 0.196
 negate: 0
 ```
 
-#News
+# News: February 2026
 I gave a talk on this at [FOSDEM 2026](https://www.fosdem.org) :
 [""Turning a cheap commercial vacuum cleaner into a useful Open Source mapping tool"](https://fosdem.org/2026/schedule/event/PDWNCJ-map-hacking-a_cheap-robot-vac-with-open-source-sw/)
