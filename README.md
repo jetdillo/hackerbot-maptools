@@ -1,4 +1,4 @@
-# hackerbot
+# hackerbot-maptools
 Tool(s) to convert the onboard maps from the [Hackerbot Industries Hackerbot](https://www.hackerbot.co/) into ROS OccupancyGrid maps
 
 What does what here:
