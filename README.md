@@ -7,12 +7,11 @@ What does what here:
 - maptexts - sample maps in compressed JSON format.
 - maps - sample map images
 
-To run, do one of the following:
 
-   - Use map_puller.py to download a map from your robot onto the onboard Raspi 
-   - cut-and-paste the terminal output from a Python miniterm session:
-     Send `MACHINE,1` followed by `GETMAP,1` (or whatever map you want) and save the whole
-     JSON output from the `GETMAP,1` command to a text file. The file should have 1 continuous, very long JSON string(See the `maptexts` directory for examples)
+This is still kind of experimental, but has been beaten on quite a bit over the past few months since the initial release in May 2025.
+There are probably more efficient/"better" ways to do some of the pixel/array torturing going on here, but I've also tried to keep the
+package requirements down to just OpenCV and NumPy.
+
 
 ```
 usage: hackerbot_map_utils.py [-h] (-f PATH | -s MAP_ID | -i | -m MAP_DUMP) [-r] [-o [OUTDIR]] [-d]
@@ -34,8 +33,26 @@ options:
 
 ```
    
-   - Run `hackerbot_map_utils.py -f <textfile>`. You should see output showing the resolution of the decompressed map and number of bytes processed from the script along with a new .pgm and .png file. Those are your mapfiles. 
+   - Example:
+   ```
+     python hackerbot_map_utils.py -s 3 -r -d -o /home/hackerbot_user
+Namespace(file=None, stored_map=3, inventory=False, map_dump=None, ros_color=True, outdir='/home/hackerbot_user', diags=True)
+Found 1 maps: [3]
+Getting map from robot...
+Total received: 8393 bytes
+original_size 39312,lz4_size 4135,width 104, height 378,resolution 0.05000000074505806,origin_x -1.4500000476837158,origin_y -8.75
+Wrote /home/hackerbot_user/hackerbot_ros_map.pgm
+Wrote /home/hackerbot_user/hackerbot_ros_map.png
+Wrote the following rosmap.yaml:
+image: rosmap.png
+mode: trinary
+resolution: 0.1
+origin: [0.0, 0.0, 0.0]
+occupied_thresh: 0.65
+free_thresh: 0.196
+negate: 0
+```
 
-This is all still pretty experimental and based on a good bit of apriori assumptions, hand-decoding and general hackery. It works for me with the files included in the `maptexts` directory. It might even work for you! :) 
-Please let me know about successes and failures. 
- 
+#News
+I gave a talk on this at [FOSDEM 2026](https://www.fosdem.org) :
+[""Turning a cheap commercial vacuum cleaner into a useful Open Source mapping tool"](https://fosdem.org/2026/schedule/event/PDWNCJ-map-hacking-a_cheap-robot-vac-with-open-source-sw/)
