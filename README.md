@@ -1,5 +1,5 @@
 # hackerbot
-code to support the [Hackerbot Industries Hackerbot](https://www.hackerbot.co/)
+Tool(s) to convert the onboard maps from the [Hackerbot Industries Hackerbot](https://www.hackerbot.co/) into ROS OccupancyGrid maps
 
 What does what here:
 - hackerbot_map_utils.py  - decodes JSON-based compressed maps into ROS-compatible map files
