@@ -45,7 +45,7 @@ def hex_to_grayscale(value: int,roscolor: bool) -> int:
            return 0  # Default to black for everything else.
                      # Not likely to represent an obstacle and therefore not useful in a ROS context
 
-def generate_ros_yaml(mapname,res,origin,thresh_o,thresh_f):
+def generate_ros_yaml(mapname,path,diags,res,origin,thresh_o,thresh_f):
 #write a YAML file for the hackerbot map
 #suitable for use with the ROS map_server
    
@@ -62,11 +62,14 @@ def generate_ros_yaml(mapname,res,origin,thresh_o,thresh_f):
    yaml.add_representer(list, list_flow_style_representer)
    
    yaml_str = yaml.dump(mapfile_params_d, sort_keys=False)
-   print(yaml_str)
+   if diags:
+      print(yaml_str)
    
    try:
-      with open("rosmap.yaml","w") as mapfile:
+      yamlfile=path+"/"+"rosmap.yaml"
+      with open(yamlfile,"w") as mapfile:
          yaml.dump(mapfile_params_d,mapfile,sort_keys=False)
+         print(f"Wrote {yamlfile}")
    except yaml.emitter.EmitterError as ye:
       print(f"Error writing mapfile {ye}")
 
@@ -131,7 +134,6 @@ def get_map_from_file(file_path):
         compressed_data = data.get('compressedmapdata', '')
     else:
         compressed_data = data  # Assume the file contains just the hex string
-      #  process_map(compressed_data,True)
  
     #if not compressed_data:
     #    print("No compressedmapdata found in file")
@@ -146,7 +148,6 @@ def apply_border(map_img):
     unknown=255
 
     h,w=map_img.shape
-    print(f"height={h},width={w}")
 
     #get all the pixels from the map that show "clear" space
    
@@ -164,7 +165,7 @@ def apply_border(map_img):
     
     return map_img
     
-def map_to_occupancy(map_img,unexp=128,clear=255,sub_size=10):
+def map_to_occupancy(map_img,diags,unexp=128,clear=255,sub_size=10):
 #This flood-fills the map, preserving borders but erasing low-confidence obstacles
 #unexp - color value for unexplored regions
 #clear - color value for explored open space
@@ -195,7 +196,8 @@ def map_to_occupancy(map_img,unexp=128,clear=255,sub_size=10):
        while not found_border:
           bp = np.random.randint(len(border_vec))
           bv_r , bv_c = border_vec[bp][:2]
-          print(f"trying {bv_r-sub_size}:{bv_c-sub_size},{bv_r+sub_size}:{bv_c+sub_size}")
+          if diags:
+             print(f"trying {bv_r-sub_size}:{bv_c-sub_size},{bv_r+sub_size}:{bv_c+sub_size}")
           submap=map_img[bv_r-sub_size:bv_c-sub_size,bv_r+sub_size:bv_c+sub_size]
 
           #Match exactly grey/white
@@ -207,7 +209,6 @@ def map_to_occupancy(map_img,unexp=128,clear=255,sub_size=10):
 
              for y in range(bv_r-10,bv_r+10):
                 for x in range(bv_c-10,bv_c+10):
-                   print(map_img.shape)
                    if map_img[y,x] == 128:
                       inseed=[y,x]
                    if map_img[y,x] == 255:
@@ -215,7 +216,9 @@ def map_to_occupancy(map_img,unexp=128,clear=255,sub_size=10):
     
                    if len(inseed) >0 and len(outseed) >0: 
                       break
-             print(f"inseed = {inseed} outseed = {outseed}")
+             if diags:
+                print("Map dimensions {map_img.shape}")
+                print(f"inseed = {inseed} outseed = {outseed}")
     
           else:
              tries+=1
@@ -235,12 +238,12 @@ def map_to_occupancy(map_img,unexp=128,clear=255,sub_size=10):
           
           cv2.floodFill(map_img, mask, inseed, internal_color, lo_diff, up_diff, flags)
           cv2.floodFill(map_img, mask, outseed, external_color, lo_diff,up_diff, flags)
-          cv2.imwrite('flood_filled_result.jpg', map_img)  
+          if diags:
+             cv2.imwrite(path+'/'+'flood_filled_result.jpg', map_img)  
           return map_img
     
-def process_map(lz4data,roscolor):
+def process_map(lz4data,roscolor,diags):
     byte_data=bytearray(b'')
-    print(type(lz4data))
     if type(lz4data) is str:
        try:
            byte_data = bytes.fromhex(lz4data)
@@ -264,8 +267,9 @@ def process_map(lz4data,roscolor):
     except struct.error as e:
         print(f"Error unpacking header: {e}")
         return None
-
-    print(f"original_size {original_size},lz4_size {lz4_size},width {width}, height {height},resolution {resolution},origin_x {origin_x},origin_y {origin_y}") 
+    
+    if diags:
+       print(f"original_size {original_size},lz4_size {lz4_size},width {width}, height {height},resolution {resolution},origin_x {origin_x},origin_y {origin_y}") 
     # Extract the compressed data
     compressed_cells = byte_data[header_size:header_size + lz4_size]
     
@@ -283,19 +287,21 @@ def process_map(lz4data,roscolor):
         return None
     
     # Create a result dictionary with all the information
-    result = {
-        'id': id_num,
-        'original_size': original_size,
-        'compressed_size': lz4_size,
-        'width': width,
-        'height': height,
-        'resolution': resolution,
-        'origin_x': origin_x,
-        'origin_y': origin_y,
-        'decompressed_data': decompressed_cells,
-        'grid': []
-    }
-   
+    if diags:
+        result = {
+            'id': id_num,
+            'original_size': original_size,
+            'compressed_size': lz4_size,
+            'width': width,
+            'height': height,
+            'resolution': resolution,
+            'origin_x': origin_x,
+            'origin_y': origin_y,
+#            'decompressed_data': decompressed_cells,
+            'grid': []
+        }
+        print(f"lz4 diagnostics \n {result}") 
+    
     #Might be able to skip the PIL steps here but run with it for now.... 
     map_data = [hex_to_grayscale(cell,True) for cell in decompressed_cells]
     map_image = Image.new("L", (width,height))
@@ -304,16 +310,17 @@ def process_map(lz4data,roscolor):
    
     bounded_map=apply_border(cv_map) 
     if roscolor:
-       return map_to_occupancy(bounded_map)
+       return map_to_occupancy(bounded_map,diags)
     else:
        return bounded_map
 
-def write_map(map_image,outpath):
+def write_map(map_image,outpath,diags):
     ros_map = outpath+"/"+"hackerbot_ros_map.pgm"
     ros_map_png = outpath+"/"+"hackerbot_ros_map.png"
     cv2.imwrite(ros_map,map_image)   
     cv2.imwrite(ros_map_png,map_image)   
-    generate_ros_yaml("rosmap.png",0.1,[0.0,0.0,0.0],0.65,0.196)   
+    generate_ros_yaml("rosmap.png",outpath,diags,0.1,[0.0,0.0,0.0],0.65,0.196)
+    print(f"Wrote:\n{ros_map}\n{ros_map_png}")
 
 def main():  
     ap = argparse.ArgumentParser(
@@ -387,8 +394,8 @@ def main():
        map_path = args.file
        mapdata = get_map_from_file(args.file) 
 
-    map_image=process_map(mapdata,args.ros_color)
-    write_map(map_image,args.outdir)
+    map_image=process_map(mapdata,args.ros_color,args.diags)
+    write_map(map_image,args.outdir,args.diags)
    
 
 if __name__ == "__main__":
