@@ -1,7 +1,8 @@
 # hackerbot-maptools
 Tool(s) to convert the onboard maps from the [Hackerbot Industries Hackerbot](https://www.hackerbot.co/) into ROS OccupancyGrid maps
+<img width="1030" height="802" alt="image" src="https://github.com/user-attachments/assets/149c8e3c-915a-48a5-b001-18d268b64007" />
 
-What does what here:
+## What does what here:
 - hackerbot_map_utils.py  - decodes JSON-based compressed maps into ROS-compatible map files
 - MapPuller.py - Class for handling robot<->host I/O, map retrieval and management
 - maptexts - sample maps in compressed JSON format.
