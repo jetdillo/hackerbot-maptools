@@ -206,7 +206,7 @@ def map_to_occupancy(map_img,diags,unexp=128,clear=255,sub_size=10):
              found_border=True 
 
              #ugly and slow but the submap is tiny 
-
+             #and this conclusively works. 
              for y in range(bv_r-10,bv_r+10):
                 for x in range(bv_c-10,bv_c+10):
                    if map_img[y,x] == 128:
@@ -238,8 +238,6 @@ def map_to_occupancy(map_img,diags,unexp=128,clear=255,sub_size=10):
           
           cv2.floodFill(map_img, mask, inseed, internal_color, lo_diff, up_diff, flags)
           cv2.floodFill(map_img, mask, outseed, external_color, lo_diff,up_diff, flags)
-          if diags:
-             cv2.imwrite(path+'/'+'flood_filled_result.jpg', map_img)  
           return map_img
     
 def process_map(lz4data,roscolor,diags):
